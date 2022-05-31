@@ -1,0 +1,53 @@
+name: 'Generate Tag and Publish'
+on:
+  workflow_dispatch:
+    inputs:
+      increment:
+        description: 'SemVer Increment Value'
+        required: true
+        type: choice
+        default: 'patch'
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  generate-tag:
+    name: SemVer Tag
+    runs-on: ubuntu-latest
+    steps:
+      - id: tag
+        uses: UKHomeOffice/semver-tag-action@v2
+        if: contains(steps.label.outputs.matchedLabels, 'skip-release') == false
+        with:
+          increment: ${{ github.event.inputs.increment }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_use_head_tag: ${{ github.base_ref == 'main' }}
+      - shell: bash
+        run: |
+          echo ${{ steps.tag.outputs.version }} > generated-version.txt
+      - name: Upload math result for job 1
+        uses: actions/upload-artifact@v3
+        with:
+          name: version
+          path: generated-version.txt
+  build:
+    name: Build and Push NPM
+    needs: generate-tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: actions/download-artifact@v3
+        with:
+          name: version
+      - shell: bash
+        id: version
+        run: |
+          echo ::set-output name=VERSION::${cat generated-version.txt}
+      - run: npm run build
+      - run: npm version ${{ steps.version.outputs.VERSION }}
+      - run: npm publish
