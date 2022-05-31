@@ -1,0 +1,20 @@
+{
+  "name": "@LiamMacP/github-packages-test-liam",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/test.json",
+  "scripts": {
+    "create-directory": "mkdir -p dist; cp src/main/resources/test.json dist/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LiamMacP/GitHubPackagesTest.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LiamMacP/GitHubPackagesTest/issues"
+  },
+  "homepage": "https://github.com/LiamMacP/GitHubPackagesTest#readme",
+  "files": ["dist/*.json"]
+}
