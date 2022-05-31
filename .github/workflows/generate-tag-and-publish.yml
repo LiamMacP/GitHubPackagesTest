@@ -32,7 +32,7 @@ jobs:
         with:
           name: version
           path: generated-version.txt
-  build:
+  build-npm:
     name: Build and Push NPM
     needs: generate-tag
     runs-on: ubuntu-latest
@@ -52,3 +52,26 @@ jobs:
       - run: npm publish
         env:
           PACKAGE_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
+  build-java:
+    name: Build and Push Java
+    needs: generate-tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - uses: actions/download-artifact@v3
+        with:
+          name: version
+      - id: version
+        run: |
+          echo ::set-output name=VERSION::$(cat generated-version.txt)
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Execute Gradle build
+        run: ./gradlew publish
+        env:
+          PACKAGE_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
+          PACKAGE_USERNAME: "LiamMacP"
