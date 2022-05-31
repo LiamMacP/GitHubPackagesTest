@@ -1,6 +1,5 @@
 {
   "name": "@LiamMacP/github-packages-test-liam",
-  "version": "1.0.0",
   "description": "",
   "main": "dist/test.json",
   "scripts": {
